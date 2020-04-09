@@ -4,10 +4,9 @@ from pathlib import Path
 
 def getText(filename):
     doc = docx.Document(filename)
-    fullText=[]
+    fullText = []
     for para in doc.paragraphs:
         fullText.append(para.text)
-    fullText.append('100.')
     return '\n'.join(fullText)
 
 def string_similar(s1, s2):
@@ -57,7 +56,12 @@ def ckduplicate(dir,obj):
     for file in dirFiles:
         if endWith(file, 'docx'):
             hasDocx=True
-            text = getText(dir + '/' + file)
+            try:
+                text = getText(dir + '/' + file)
+            except Exception as e:
+                obj.appendSignal.emit("文件【"+file+"】已打开，请关闭后重试！")
+                return
+
             posList = []
 
             for i in range(len(titleList)):
@@ -76,7 +80,9 @@ def ckduplicate(dir,obj):
 
                     endPos = tempPosList[tempPosList.index(posList[i]) + 1]
 
-                    resList = pattern.findall(text, startPos, endPos)
+                    foundStr=text[startPos:endPos]+"\n100."
+
+                    resList = pattern.findall(foundStr)
 
                     sectionQuesList[i].extend(resList)
 
@@ -102,14 +108,11 @@ def ckduplicate(dir,obj):
                 ss = string_similar(sectionQues[i], sectionQues[j])
 
                 if ss > 0.9:
-                    # print('【' + filenameList[sectionQuesList.index(sectionQues)][i] + '】' + sectionQues[i] + '\n\n【' +
-                    #       filenameList[sectionQuesList.index(sectionQues)][j] + '】' + sectionQues[j])
-                    # print("相似度=%f" % ss)
-                    # print("=====================")
-                    obj.appendSignal.emit('【' + filenameList[sectionQuesList.index(sectionQues)][i] + '】' + sectionQues[i] + '\n\n【' +
-                           filenameList[sectionQuesList.index(sectionQues)][j] + '】' + sectionQues[j])
-                    obj.appendSignal.emit("\n【相似度=%f】" % ss)
-                    obj.appendSignal.emit("======================================")
+                    fnStr='\n【' + filenameList[sectionQuesList.index(sectionQues)][i] + '】' + sectionQues[i] + '\n\n【' + filenameList[sectionQuesList.index(sectionQues)][j] + '】' + sectionQues[j]
+                    similarStr="\n【相似度=" + ss.__str__() + "】"
+                    splitStr="\n======================================"
+
+                    obj.appendSignal.emit(fnStr+similarStr+splitStr)
                     QApplication.processEvents()
             progress = progress + 1
             percent = progress / (questionNum-1)
@@ -138,12 +141,16 @@ def checkDuplicateWithoutTitle(dir,obj):
     hasDocx = False
     questionList = []
 
-    obj.appendSignal.emit('======================================')
     for file in dirFiles:
         if endWith(file, 'docx'):
             # print(file)
             hasDocx = True
-            text = getText(dir + '/' + file)
+            try:
+                text = getText(dir + '/' + file)
+            except Exception as e:
+                obj.appendSignal.emit("文件【"+file+"】已打开，请关闭后重试！")
+                return
+            text=text+"\n100."
             resList = pattern.findall(text)
             questionList.extend(resList)
 
@@ -164,9 +171,11 @@ def checkDuplicateWithoutTitle(dir,obj):
             sim = string_similar(questionList[i], questionList[j])
 
             if sim > 0.9:
-                obj.appendSignal.emit('======================================')
-                obj.appendSignal.emit('【' + filenameList[i] + '】' + questionList[i] + '\n\n【' + filenameList[j] + '】' + questionList[j])
-                obj.appendSignal.emit('\n【相似度=%f】' % sim)
+                splitStr="\n======================================"
+                fnStr='\n【' + filenameList[i] + '】' + questionList[i] + '\n\n【' + filenameList[j] + '】' + questionList[j]
+                similarStr='\n【相似度='+sim.__str__()+'】'
+
+                obj.appendSignal.emit(splitStr + fnStr + similarStr)
                 QApplication.processEvents()
 
         percent = (i+1) / (len(questionList)-1)
