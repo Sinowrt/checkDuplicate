@@ -1,6 +1,9 @@
 import re,docx,os,difflib,time
 from PyQt5.QtWidgets import *
 from pathlib import Path
+from datasketch import MinHash, MinHashLSH
+from nltk import ngrams
+import traceback
 
 def getText(filename):
     doc = docx.Document(filename)
@@ -16,6 +19,45 @@ def string_similar(s1, s2):
 def endWith(s,*endstring):
     array = map(s.endswith, endstring)
     return True in array
+
+def lsh(questionList):
+    collectionIndexArray = [-1 for i in range(len(questionList))]
+    collections = []
+
+    lsh = MinHashLSH(threshold=0.85, num_perm=256)
+
+    minhashes = {}
+    for c, i in enumerate(questionList):
+        minhash = MinHash(num_perm=256)
+        for d in ngrams(i, 2):
+            minhash.update("".join(d).encode('utf-8'))
+        lsh.insert(c, minhash)
+        minhashes[c] = minhash
+
+    for i in range(len(minhashes.keys())):
+        result = lsh.query(minhashes[i])
+        if len(result) >= 2:
+
+            newcollection = True
+            findIndex = -1
+
+            for index in result:
+                if collectionIndexArray[index] != -1:
+                    newcollection = False
+                    findIndex = collectionIndexArray[index]
+                    break;
+
+            if newcollection:
+                collections.append(result)
+            else:
+                collections[findIndex] = list(set(collections[findIndex]).union(set(result)))
+
+            letindex = len(collections) - 1 if newcollection else findIndex
+
+            for index in result:
+                collectionIndexArray[index] = letindex
+
+    return collections
 
 def ckduplicate(dir,obj):
 
@@ -95,30 +137,44 @@ def ckduplicate(dir,obj):
                     obj.appendSignal.emit(
                         "【" + file + "】 | 【" + titleList[i].replace('\n', '') + "】没有匹配到该标题！请检查！")
 
-            obj.appendSignal.emit("======================================\n")
+            obj.appendSignal.emit("======================================")
+
+
 
     if not(hasDocx):
         obj.appendSignal.emit('该目录下找不到任何docx文件')
         return
 
-    progress=0
-    for sectionQues in sectionQuesList:
-        for i in range(len(sectionQues) - 1):
-            for j in range(i + 1, len(sectionQues)):
-                ss = string_similar(sectionQues[i], sectionQues[j])
+    progress=1
 
-                if ss > 0.9:
-                    fnStr='\n【' + filenameList[sectionQuesList.index(sectionQues)][i] + '】' + sectionQues[i] + '\n\n【' + filenameList[sectionQuesList.index(sectionQues)][j] + '】' + sectionQues[j]
-                    similarStr="\n【相似度=" + ss.__str__() + "】"
-                    splitStr="\n======================================"
+    for x in range(len(sectionQuesList)):
 
-                    obj.appendSignal.emit(fnStr+similarStr+splitStr)
-                    QApplication.processEvents()
-            progress = progress + 1
-            percent = progress / (questionNum-1)
+        questionlistFixed = []
+
+        # 删掉空格、制表符、换行符
+        for question in sectionQuesList[x]:
+            questionlistFixed.append(re.sub('\s+', '', question).strip())
+
+        collections=lsh(questionlistFixed)
+
+        try:
+            printStr = ""
+
+            for array in collections:
+                for index in array:
+                    printStr = printStr + "【"+filenameList[x][index] + "】\n"
+                    printStr = printStr + questionlistFixed[index]+ "\n"
+
+                printStr = printStr + "==============================\n"
+
+            if len(printStr) != 0:
+                obj.appendSignal.emit(printStr)
+            percent = progress / len(sectionQuesList)
             obj.updateProgressSignal.emit(percent * 100)
+            progress=progress+1
 
-        progress=progress+1
+        except Exception as e:
+            traceback.print_exc()
 
     end = time.time()
     obj.appendSignal.emit("Execution Time: %f" %(end - start))
@@ -164,23 +220,38 @@ def checkDuplicateWithoutTitle(dir,obj):
         obj.appendSignal.emit('该目录下找不到任何docx文件')
 
     obj.appendSignal.emit('【共匹配到%d题】' % len(questionList))
-    for i in range(len(questionList) - 1):
 
-        for j in range(i + 1, len(questionList)):
+    obj.appendSignal.emit('======================================\n')
 
-            sim = string_similar(questionList[i], questionList[j])
+    questionlistFixed = []
 
-            if sim > 0.9:
-                splitStr="\n======================================"
-                fnStr='\n【' + filenameList[i] + '】' + questionList[i] + '\n\n【' + filenameList[j] + '】' + questionList[j]
-                similarStr='\n【相似度='+sim.__str__()+'】'
+    # 删掉空格、制表符、换行符
+    for question in questionList:
+        questionlistFixed.append(re.sub('\s+', '', question).strip())
 
-                obj.appendSignal.emit(splitStr + fnStr + similarStr)
-                QApplication.processEvents()
+    obj.updateProgressSignal.emit(30)
 
-        percent = (i+1) / (len(questionList)-1)
-        # print(percent)
-        obj.updateProgressSignal.emit(percent * 100)
+    collections = lsh(questionlistFixed)
+
+    try:
+        printStr = ""
+        progress=1
+        for array in collections:
+            percent = progress / len(collections)
+            obj.updateProgressSignal.emit(30 if percent * 100 <= 30 else percent * 100)
+            progress=progress+1
+            for index in array:
+                printStr = printStr + "【" + filenameList[index] + "】\n"
+                printStr = printStr + questionlistFixed[index] + "\n\n"
+
+            printStr = printStr + "==============================\n"
+
+        if len(printStr) != 0:
+            obj.appendSignal.emit(printStr)
+
+
+    except Exception as e:
+        traceback.print_exc()
 
     end = time.time()
     obj.appendSignal.emit("Execution Time: %f" %(end - start))
