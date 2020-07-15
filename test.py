@@ -87,19 +87,19 @@ def checkDuplicateWithoutTitle(dir):
 
     print('【共匹配到%d题】' % len(questionList))
 
-    questionlistAfter=[]
+    questionlistFixed=[]
 
     for question in questionList:
-        questionlistAfter.append(re.sub('\s+', '', question).strip())
+        questionlistFixed.append(re.sub('\s+', '', question).strip())
 
-    collectionIndexArray=[-1 for i in range(len(questionlistAfter))]
+    collectionIndexArray=[-1 for i in range(len(questionlistFixed))]
     collections=[]
 
     lsh = MinHashLSH(threshold=0.85, num_perm=256)
 
     # Create MinHash objects
     minhashes = {}
-    for c, i in enumerate(questionlistAfter):
+    for c, i in enumerate(questionlistFixed):
         minhash = MinHash(num_perm=256)
         for d in ngrams(i, 2):
             minhash.update("".join(d).encode('utf-8'))
@@ -109,7 +109,6 @@ def checkDuplicateWithoutTitle(dir):
     for i in range(len(minhashes.keys())):
         result = lsh.query(minhashes[i])
         if len(result) >= 2:
-            # print("Candidates with Jaccard similarity > 0.85 for input", i, ":", result)
 
             newcollection = True
             findIndex = -1
@@ -131,7 +130,6 @@ def checkDuplicateWithoutTitle(dir):
                 collectionIndexArray[index] = letindex
 
     print(len(collections))
-    # print(collections)
 
     for array in collections:
         print("\r")
@@ -139,7 +137,7 @@ def checkDuplicateWithoutTitle(dir):
             print(filenameList[index],"")
 
         for index in array:
-            print(questionlistAfter[index])
+            print(questionlistFixed[index])
 
     end = time.time()
     print("Execution Time: %f" %(end - start))
