@@ -1,9 +1,8 @@
-import re,docx,os,difflib,time
+import re,docx,os,difflib,time,traceback
 from PyQt5.QtWidgets import *
 from pathlib import Path
 from datasketch import MinHash, MinHashLSH
 from nltk import ngrams
-import traceback
 
 def getText(filename):
     doc = docx.Document(filename)
@@ -75,9 +74,8 @@ def ckduplicate(dir,obj):
     for i in range(len(titleList)):
         titleList[i]=titleList[i]+'\n'
 
-    print(titleList)
-
-    pattern = re.compile(r'\n[1-9][0-9]{0,2}[、|.].*?(?=\n[1-9][0-9]{0,2}[、|.])', re.S)  # 查找数字
+    # 查找数字
+    pattern = re.compile(r'\n[1-9][0-9]{0,2}[、|.].*?(?=\n[1-9][0-9]{0,2}[、|.])', re.S)
 
     # 获取文档对象
     # dir = 'E:\\mcp\\word试题查重'
@@ -236,19 +234,23 @@ def checkDuplicateWithoutTitle(dir,obj):
     try:
         printStr = ""
         progress=1
-        for array in collections:
-            percent = progress / len(collections)
-            obj.updateProgressSignal.emit(30 if percent * 100 <= 30 else percent * 100)
-            progress=progress+1
-            for index in array:
-                printStr = printStr + "【" + filenameList[index] + "】\n"
-                printStr = printStr + questionlistFixed[index] + "\n\n"
+        # 判断是否找到重复的题目
+        if len(collections)==0:
+            obj.updateProgressSignal.emit(100)
+            obj.appendSignal.emit("在该题集中未找到重复的题目。")
+        else:
+            for array in collections:
+                percent = progress / len(collections)
+                obj.updateProgressSignal.emit(30 if percent * 100 <= 30 else percent * 100)
+                progress=progress+1
+                for index in array:
+                    printStr = printStr + "【" + filenameList[index] + "】\n"
+                    printStr = printStr + questionlistFixed[index] + "\n\n"
 
-            printStr = printStr + "==============================\n"
+                printStr = printStr + "==============================\n"
 
-        if len(printStr) != 0:
-            obj.appendSignal.emit(printStr)
-
+                if len(printStr) != 0:
+                    obj.appendSignal.emit(printStr)
 
     except Exception as e:
         traceback.print_exc()

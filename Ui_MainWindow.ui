@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1094</width>
+    <height>688</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,163 +24,133 @@
     <normaloff>C:/Users/Jacky/Pictures/20200401004730.jpg</normaloff>C:/Users/Jacky/Pictures/20200401004730.jpg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="browseButton">
-    <property name="geometry">
-     <rect>
-      <x>714</x>
-      <y>39</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>浏览</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>40</y>
-      <width>621</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>61</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>试卷路径:</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="checkButton">
-    <property name="geometry">
-     <rect>
-      <x>960</x>
-      <y>40</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>开始查重</string>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>111</y>
-      <width>1061</width>
-      <height>681</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>80</y>
-      <width>1011</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>41</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>进度：</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>691</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Note:【查重前】请确认每个题目编号后为、或.号，并且选项ABCD的编号为纯文字类型，以图片形式承载的ABCD选项暂时无法处理</string>
-    </property>
-   </widget>
-   <widget class="QListView" name="titleListView">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>110</y>
-      <width>111</width>
-      <height>681</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="addTitleBtn">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>40</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>添加标题</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="delTitleBtn">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>70</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>删除标题</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="titleLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>10</y>
-      <width>111</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="enableTitleCheckBox">
-    <property name="geometry">
-     <rect>
-      <x>840</x>
-      <y>40</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>启用标题查找</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0" colspan="3">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Note:【查重前】请确认每个题目编号后为、或.号，并且选项ABCD的编号为纯文字类型，以图片形式承载的ABCD选项暂时无法处理</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLineEdit" name="titleLineEdit">
+      <property name="minimumSize">
+       <size>
+        <width>111</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>111</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>试卷路径:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+    <item row="1" column="3">
+     <widget class="QPushButton" name="browseButton">
+      <property name="text">
+       <string>浏览</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QCheckBox" name="enableTitleCheckBox">
+      <property name="text">
+       <string>启用标题查找</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QPushButton" name="checkButton">
+      <property name="text">
+       <string>开始查重</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="QPushButton" name="addTitleBtn">
+      <property name="minimumSize">
+       <size>
+        <width>111</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>111</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>添加标题</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>进度：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" colspan="5">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="6">
+     <widget class="QPushButton" name="delTitleBtn">
+      <property name="minimumSize">
+       <size>
+        <width>111</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>111</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>删除标题</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="6">
+     <widget class="QTextBrowser" name="textBrowser"/>
+    </item>
+    <item row="3" column="6">
+     <widget class="QListView" name="titleListView">
+      <property name="minimumSize">
+       <size>
+        <width>111</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>111</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
